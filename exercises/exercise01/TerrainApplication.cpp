@@ -29,8 +29,8 @@ struct Vector3
 // (todo) 01.8: Declare an struct with the vertex format
 
 
-TerrainApplication::TerrainApplication()
-    : Application(1024, 1024, "Terrain demo"), m_gridX(16), m_gridY(16), m_shaderProgram(0)
+TerrainApplication::TerrainApplication(unsigned int x, unsigned int y)
+    : Application(1024, 1024, "Terrain demo"), m_gridX(x), m_gridY(y), m_shaderProgram(0)
 {
 }
 
@@ -43,15 +43,24 @@ void TerrainApplication::Initialize()
 
     std::vector<Vector3> vertices;
 
-    for (int y = 0; y <= m_gridY; ++y)
+	float scale_x = 1.0f / m_gridX;
+	float scale_y = 1.0f / m_gridY;
+
+    for (int y = 0; y < m_gridY; y++)
     {
-        for ( int x = 0; x <= m_gridX; ++x)
+        for (int x = 0; x < m_gridX; x++)
         {
+			float x0_scaled = (x * scale_x)-0.5f;
+			float y0_scaled = (y * scale_y)-0.5f;
+
+			float x1_scaled = ((x + 1) * scale_x) - 0.5f;
+			float y1_scaled = ((y + 1) * scale_y) - 0.5f;
+
 			//Make vertices for square
-			Vector3 buttomLeft(x, y, 0.0f); // A
-			Vector3 buttomRight(x + 1.0f, y, 0.0f); // B
-			Vector3 topLeft(x, y + 1.0f, 0);    // C
-			Vector3 topRight(x + 1.0f, y + 1.0f, 0.0f); // D
+			Vector3 buttomLeft(x0_scaled, y0_scaled, 0.0f); // A
+			Vector3 buttomRight(x1_scaled, y0_scaled, 0.0f); // B
+			Vector3 topLeft(x0_scaled, y1_scaled, 0);    // C
+			Vector3 topRight(x1_scaled, y1_scaled, 0.0f); // D
 
             // make first triangele
 			vertices.push_back(topRight);
@@ -100,9 +109,9 @@ void TerrainApplication::Render()
     // Set shader to be used
     glUseProgram(m_shaderProgram);
 
-    // (todo) 01.1: Draw the grid
 	VAO.Bind();
-    glDrawArrays(GL_TRIANGLES, 0, (m_gridX * m_gridY * 3));
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); 
+    glDrawArrays(GL_TRIANGLES, 0, (m_gridX * m_gridY * 6));
 	VAO.Unbind();
 
 }

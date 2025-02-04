@@ -10,6 +10,7 @@ class TerrainApplication : public Application
 {
 public:
     TerrainApplication();
+    TerrainApplication(unsigned int gridX, unsigned int gridY);
 
 protected:
     void Initialize() override;
