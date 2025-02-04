@@ -76,30 +76,6 @@ int main()
     auto [circleVertices, circleIndices] = drawCircle(0.5f, 50);
 
 
-    //// Using std::array instead of regular arrays makes sure we don't access out of range
-    //std::array<float, 3 * (sides + 1)> vertices;
-    //std::array<unsigned int, 3 * sides> indices;
-
-    //// first vertex centered at (0, 0, 0)
-    //vertices[0] = vertices[1] = vertices[2] = 0.0f;
-
-    //// Loop over 2*PI with N sides
-    //float deltaAngle = 2 * pi / sides;
-    //for (int i = 0; i < sides; ++i)
-    //{
-    //    float angle = i * deltaAngle;
-    //    vertices[3 * i + 3] = std::sin(angle) * length;
-    //    vertices[3 * i + 4] = std::cos(angle) * length;
-    //    vertices[3 * i + 5] = 0.0f;
-
-    //    indices[3 * i + 0] = 0;
-    //    indices[3 * i + 1] = i + 1;
-    //    indices[3 * i + 2] = i + 2;
-    //}
-
-    //// Connect last index with vertex 1 to close the circle
-    //indices[3 * sides - 1] = 1;
-
     VertexBufferObject vbo;
     VertexArrayObject vao;
     ElementBufferObject ebo;
