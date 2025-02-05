@@ -42,6 +42,7 @@ void TerrainApplication::Initialize()
     BuildShaders();
 
     std::vector<Vector3> vertices;
+    std::vector<Vector2> uvs;
 
 	float scale_x = 1.0f / m_gridX;
 	float scale_y = 1.0f / m_gridY;
@@ -50,6 +51,8 @@ void TerrainApplication::Initialize()
     {
         for (int x = 0; x < m_gridX; x++)
         {
+			
+
 			float x0_scaled = (x * scale_x)-0.5f;
 			float y0_scaled = (y * scale_y)-0.5f;
 
@@ -67,10 +70,18 @@ void TerrainApplication::Initialize()
 			vertices.push_back(buttomLeft);
 			vertices.push_back(buttomRight);
 
+            uvs.push_back(Vector2(1.0f, 1.0f));
+            uvs.push_back(Vector2(0.0f, 0.0f));
+            uvs.push_back(Vector2(1.0f, 0.0f));
+
 			// make second triangle
 			vertices.push_back(topRight);
 			vertices.push_back(topLeft);
 			vertices.push_back(buttomLeft);
+
+            uvs.push_back(Vector2(1.0f, 1.0f));
+            uvs.push_back(Vector2(0.0f, 1.0f));
+            uvs.push_back(Vector2(0.0f, 0.0f));
 
         }
     }
@@ -78,10 +89,20 @@ void TerrainApplication::Initialize()
 	VAO.Bind();
 
 	VBO.Bind();
-	VBO.AllocateData<const Vector3>(vertices);
+    size_t verticiesSize = vertices.size() * sizeof(Vector3);
+    size_t uvsSize = uvs.size() * sizeof(Vector2);
+	VBO.AllocateData(verticiesSize + uvsSize); // Allocate memory for vertices and uvs
 
+	VBO.UpdateData(std::span<const Vector3>(vertices), 0); // Update with vertex data
+	VBO.UpdateData(std::span<const Vector2>(uvs), verticiesSize); // Update with uv data, offset by vertexDataSize
+
+	// Set position attribute
     VertexAttribute position(Data::Type::Float, 3);
     VAO.SetAttribute(0, position, 0);
+
+	// Set UV attribute
+    VertexAttribute uv(Data::Type::Float, 2);
+    VAO.SetAttribute(1, uv, verticiesSize);
 
     // (todo) 01.5: Initialize EBO
 
@@ -110,7 +131,7 @@ void TerrainApplication::Render()
     glUseProgram(m_shaderProgram);
 
 	VAO.Bind();
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); 
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // Draw in wireframe polygons
     glDrawArrays(GL_TRIANGLES, 0, (m_gridX * m_gridY * 6));
 	VAO.Unbind();
 
