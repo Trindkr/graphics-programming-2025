@@ -1,9 +1,14 @@
 #include "TerrainApplication.h"
 #include "ituGL/geometry/VertexAttribute.h"
 
+#define STB_PERLIN_IMPLEMENTATION
+#include "stb_perlin.h"
+
 #include <vector>
 #include <cmath>
 #include <iostream>
+
+
 
 // Helper structures. Declared here only for this exercise
 struct Vector2
@@ -50,6 +55,11 @@ void TerrainApplication::Initialize()
 	float scale_x = 1.0f / m_gridX;
 	float scale_y = 1.0f / m_gridY;
 
+    float frequency = 5.0f; 
+    float amplitude = 0.1f;
+    float lacunarity = 2.0f; 
+    int octaves = 4;
+
     // create verticies and uvs
     for (int y = 0; y <= m_gridY; y++)
     {
@@ -57,34 +67,20 @@ void TerrainApplication::Initialize()
         {
             float x_scaled = (x * scale_x) - 0.5f;
             float y_scaled = (y * scale_y) - 0.5f;
+            float z_scaled = 0.0f;
 
+            float freq = frequency;
+            float amp = amplitude;
+            for (int i = 0; i < octaves; i++)
+            {
+                z_scaled += stb_perlin_noise3(x_scaled * freq, y_scaled * freq, 0.0f, 0, 0, 0) * amp;
+                freq *= lacunarity;
+                amp *= 0.5f; // usually amplitude is halved for each octave
+            }
 
-            vertices.push_back(Vector3(x_scaled, y_scaled, 0.0f));
-            uvs.push_back(Vector2(x , y ));
-			////Make vertices for square
-			//Vector3 buttomLeft(x0_scaled, y0_scaled, 0.0f); // A
-			//Vector3 buttomRight(x1_scaled, y0_scaled, 0.0f); // B
-			//Vector3 topLeft(x0_scaled, y1_scaled, 0);    // C
-			//Vector3 topRight(x1_scaled, y1_scaled, 0.0f); // D
-
-   //         // make first triangele
-			//vertices.push_back(topRight);
-			//vertices.push_back(buttomLeft);
-			//vertices.push_back(buttomRight);
-
-   //         uvs.push_back(Vector2(1.0f, 1.0f));
-   //         uvs.push_back(Vector2(0.0f, 0.0f));
-   //         uvs.push_back(Vector2(1.0f, 0.0f));
-
-			//// make second triangle
-			//vertices.push_back(topRight);
-			//vertices.push_back(topLeft);
-			//vertices.push_back(buttomLeft);
-
-   //         uvs.push_back(Vector2(1.0f, 1.0f));
-   //         uvs.push_back(Vector2(0.0f, 1.0f));
-   //         uvs.push_back(Vector2(0.0f, 0.0f));
-
+            vertices.push_back(Vector3(x_scaled, y_scaled, z_scaled));
+            uvs.push_back(Vector2(x , y));
+			
         }
     }
 
@@ -157,7 +153,7 @@ void TerrainApplication::Render()
     glUseProgram(m_shaderProgram);
 
 	VAO.Bind();
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // Draw in wireframe polygons
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // Draw in wireframe polygons
 	glDrawElements(GL_TRIANGLES, (m_gridX * m_gridY * 6), GL_UNSIGNED_INT, 0);
 	VAO.Unbind();
 
