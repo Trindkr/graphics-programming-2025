@@ -56,9 +56,9 @@ void TerrainApplication::Initialize()
 	float scale_y = 1.0f / m_gridY;
 
     float frequency = 5.0f; 
-    float amplitude = 0.1f;
+    float amplitude = 0.4f;
     float lacunarity = 2.0f; 
-    int octaves = 4;
+    int octaves = 8;
 
     // create verticies and uvs
     for (int y = 0; y <= m_gridY; y++)
@@ -84,6 +84,7 @@ void TerrainApplication::Initialize()
         }
     }
 
+    // Indicies creation
     for (int y = 0; y < m_gridY; y++)
     {
         for (int x = 0; x < m_gridX; x++)
