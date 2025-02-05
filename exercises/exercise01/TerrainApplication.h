@@ -9,8 +9,7 @@
 class TerrainApplication : public Application
 {
 public:
-    TerrainApplication();
-    TerrainApplication(unsigned int gridX, unsigned int gridY);
+    TerrainApplication(unsigned int x, unsigned int y);
 
 protected:
     void Initialize() override;
@@ -27,11 +26,8 @@ private:
 
     unsigned int m_shaderProgram;
 
-    // DONE 01.1: Declare an VBO, VAO
     VertexArrayObject VAO;
 	VertexBufferObject VBO;
-
-    // DONE 01.5: Declare an EBO
 	ElementBufferObject EBO;
 
 };

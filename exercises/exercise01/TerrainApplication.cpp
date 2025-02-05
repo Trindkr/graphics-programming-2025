@@ -42,49 +42,73 @@ void TerrainApplication::Initialize()
     BuildShaders();
 
     std::vector<Vector3> vertices;
+    std::vector<unsigned int> indices;
+
     std::vector<Vector2> uvs;
+
 
 	float scale_x = 1.0f / m_gridX;
 	float scale_y = 1.0f / m_gridY;
+
+    // create verticies and uvs
+    for (int y = 0; y <= m_gridY; y++)
+    {
+        for (int x = 0; x <= m_gridX; x++)
+        {
+            float x_scaled = (x * scale_x) - 0.5f;
+            float y_scaled = (y * scale_y) - 0.5f;
+
+
+            vertices.push_back(Vector3(x_scaled, y_scaled, 0.0f));
+            uvs.push_back(Vector2(x , y ));
+			////Make vertices for square
+			//Vector3 buttomLeft(x0_scaled, y0_scaled, 0.0f); // A
+			//Vector3 buttomRight(x1_scaled, y0_scaled, 0.0f); // B
+			//Vector3 topLeft(x0_scaled, y1_scaled, 0);    // C
+			//Vector3 topRight(x1_scaled, y1_scaled, 0.0f); // D
+
+   //         // make first triangele
+			//vertices.push_back(topRight);
+			//vertices.push_back(buttomLeft);
+			//vertices.push_back(buttomRight);
+
+   //         uvs.push_back(Vector2(1.0f, 1.0f));
+   //         uvs.push_back(Vector2(0.0f, 0.0f));
+   //         uvs.push_back(Vector2(1.0f, 0.0f));
+
+			//// make second triangle
+			//vertices.push_back(topRight);
+			//vertices.push_back(topLeft);
+			//vertices.push_back(buttomLeft);
+
+   //         uvs.push_back(Vector2(1.0f, 1.0f));
+   //         uvs.push_back(Vector2(0.0f, 1.0f));
+   //         uvs.push_back(Vector2(0.0f, 0.0f));
+
+        }
+    }
 
     for (int y = 0; y < m_gridY; y++)
     {
         for (int x = 0; x < m_gridX; x++)
         {
-			
+            unsigned int topLeft = y * (m_gridX + 1) + x;
+            unsigned int topRight = topLeft + 1;
+            unsigned int bottomLeft = (y + 1) * (m_gridX + 1) + x;
+            unsigned int bottomRight = bottomLeft + 1;
 
-			float x0_scaled = (x * scale_x)-0.5f;
-			float y0_scaled = (y * scale_y)-0.5f;
+            // First triangle
+            indices.push_back(topLeft);
+            indices.push_back(bottomLeft);
+            indices.push_back(bottomRight);
 
-			float x1_scaled = ((x + 1) * scale_x) - 0.5f;
-			float y1_scaled = ((y + 1) * scale_y) - 0.5f;
-
-			//Make vertices for square
-			Vector3 buttomLeft(x0_scaled, y0_scaled, 0.0f); // A
-			Vector3 buttomRight(x1_scaled, y0_scaled, 0.0f); // B
-			Vector3 topLeft(x0_scaled, y1_scaled, 0);    // C
-			Vector3 topRight(x1_scaled, y1_scaled, 0.0f); // D
-
-            // make first triangele
-			vertices.push_back(topRight);
-			vertices.push_back(buttomLeft);
-			vertices.push_back(buttomRight);
-
-            uvs.push_back(Vector2(1.0f, 1.0f));
-            uvs.push_back(Vector2(0.0f, 0.0f));
-            uvs.push_back(Vector2(1.0f, 0.0f));
-
-			// make second triangle
-			vertices.push_back(topRight);
-			vertices.push_back(topLeft);
-			vertices.push_back(buttomLeft);
-
-            uvs.push_back(Vector2(1.0f, 1.0f));
-            uvs.push_back(Vector2(0.0f, 1.0f));
-            uvs.push_back(Vector2(0.0f, 0.0f));
-
+            // Second triangle
+            indices.push_back(topLeft);
+            indices.push_back(bottomRight);
+            indices.push_back(topRight);
         }
     }
+
 
 	VAO.Bind();
 
@@ -104,12 +128,14 @@ void TerrainApplication::Initialize()
     VertexAttribute uv(Data::Type::Float, 2);
     VAO.SetAttribute(1, uv, verticiesSize);
 
-    // (todo) 01.5: Initialize EBO
-
+    // Initialize EBO
+    EBO.Bind();
+    EBO.AllocateData<unsigned int>(indices);
+    
+	// Unbind VAO, VBO and EBO
 	VAO.Unbind();
 	VBO.Unbind();
-
-    // (todo) 01.5: Unbind EBO
+    EBO.Unbind(); 
 
 }
 
@@ -132,7 +158,7 @@ void TerrainApplication::Render()
 
 	VAO.Bind();
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // Draw in wireframe polygons
-    glDrawArrays(GL_TRIANGLES, 0, (m_gridX * m_gridY * 6));
+	glDrawElements(GL_TRIANGLES, (m_gridX * m_gridY * 6), GL_UNSIGNED_INT, 0);
 	VAO.Unbind();
 
 }
