@@ -23,7 +23,6 @@ private:
 
 private:
     unsigned int m_gridX, m_gridY;
-
     unsigned int m_shaderProgram;
 
     VertexArrayObject VAO;
