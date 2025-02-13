@@ -2,6 +2,6 @@
 
 int main()
 {
-    TerrainApplication terrainApplication(128, 128);
+    TerrainApplication terrainApplication(64, 64);
     return terrainApplication.Run();
 }

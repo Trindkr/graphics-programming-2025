@@ -34,11 +34,12 @@ struct Vector3
 
 struct Vertex
 {
-	Vertex() : position(Vector3()), uv(Vector2()), color(Vector3()) {}
-	Vertex(Vector3 position, Vector2 uv, Vector3 color) : position(position), uv(uv), color(color) {}
+	Vertex() : position(Vector3()), uv(Vector2()), color(Vector3()), normal(Vector3()) {}
+	Vertex(Vector3 position, Vector2 uv, Vector3 color, Vector3 normal) : position(position), uv(uv), color(color), normal(normal) {}
 	Vector3 position;
 	Vector2 uv;
 	Vector3 color;
+	Vector3 normal;
 };
 
 // (todo) 01.8: Declare an struct with the vertex format
@@ -73,9 +74,7 @@ void TerrainApplication::Initialize()
 	float lacunarity = 2.0f;
 	int octaves = 4;
 
-
-
-	// create verticies and uvs
+	// create verticies
 	for (int y = 0; y <= m_gridY; y++)
 	{
 		for (int x = 0; x <= m_gridX; x++)
@@ -128,6 +127,63 @@ void TerrainApplication::Initialize()
 		}
 	}
 
+	// Normals
+	for (int y = 0; y <= m_gridY; y++)
+	{
+		for (int x = 0; x <= m_gridX; x++)
+		{
+			size_t columns = m_gridX + 1;
+			Vertex& currentVertex = vertices[y * columns + x];
+
+			Vertex leftVertex;
+			if (x == 0)
+			{
+				leftVertex = currentVertex;
+			}
+			else
+			{
+				leftVertex = vertices[y * columns + (x - 1)];
+			}
+
+			Vertex rightVertex;
+			if (x == m_gridX)
+			{
+				rightVertex = currentVertex;
+			}
+			else
+			{
+				rightVertex = vertices[y * columns + (x + 1)];
+			}
+
+			Vertex downVertex;
+			if (y == 0)
+			{
+				downVertex = currentVertex;
+			}
+			else
+			{
+				downVertex = vertices[(y - 1) * columns + x];
+			}
+
+			Vertex upVertex;
+			if (y == m_gridY)
+			{
+				upVertex = currentVertex;
+			}
+			else
+			{
+				upVertex = vertices[(y + 1) * columns + x];
+			}
+
+			float deltaX = (rightVertex.position.z - leftVertex.position.z) / (rightVertex.position.x - leftVertex.position.x);
+			float deltaY = (upVertex.position.z - downVertex.position.z) / (upVertex.position.y - downVertex.position.y);
+
+			Vector3 normal = Vector3(deltaX, deltaY, 1.0f).Normalize();
+			currentVertex.normal = normal;
+		}
+
+	}
+
 	// Indicies creation
 	for (int y = 0; y < m_gridY; y++)
 	{
@@ -167,6 +223,9 @@ void TerrainApplication::Initialize()
 
 	VertexAttribute color(Data::Type::Float, 3); 
 	VAO.SetAttribute(2, color, sizeof(Vector3) + sizeof(Vector2), sizeof(Vertex)); 
+
+	VertexAttribute normal(Data::Type::Float, 3);
+	VAO.SetAttribute(3, normal, sizeof(Vector3) + sizeof(Vector2) + sizeof(Vector3), sizeof(Vertex));
 
 	// Initialize EBO
 	EBO.Bind();
