@@ -7,22 +7,27 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <chrono>
 
 // Structure defining that Particle data
 struct Particle
 {
-    glm::vec2 position;
     // (todo) 02.X: Add more vertex attributes
+    glm::vec2 position;
     float size;
+    float birth;
+    float duration;
 
  
 };
 
 // List of attributes of the particle. Must match the structure above
-const std::array<VertexAttribute, 2> s_vertexAttributes =
+const std::array<VertexAttribute, 4> s_vertexAttributes =
 {
     VertexAttribute(Data::Type::Float, 2), // position
 	VertexAttribute(Data::Type::Float, 1), // size
+	VertexAttribute(Data::Type::Float, 1), // birth
+	VertexAttribute(Data::Type::Float, 1)  // duration
     // (todo) 02.X: Add more vertex attributes
 
 };
@@ -70,8 +75,9 @@ void ParticlesApplication::Update()
         // (todo) 02.X: Compute new particle attributes here
 
 		float randomSize = RandomRange(1.0f, 20.0f); //compute random size
-
-        EmitParticle(mousePosition, randomSize);
+		float randomDuration = RandomRange(1.0f, 2.0f); //compute random duration
+		
+        EmitParticle(mousePosition, randomSize, randomDuration);
     }
 
     // save the mouse position (to compare next frame and obtain velocity)
@@ -86,8 +92,9 @@ void ParticlesApplication::Render()
     // Set our particles shader program
     m_shaderProgram.Use();
 
-    // (todo) 02.4: Set CurrentTime uniform
-
+    //Set CurrentTime uniform
+    float currentTime = GetCurrentTime();
+    glUniform1f(m_currentTimeLocation, currentTime);
 
     // (todo) 02.6: Set Gravity uniform
 
@@ -149,16 +156,19 @@ void ParticlesApplication::InitializeShaders()
         std::cout << "Error linking shaders" << std::endl;
         std::cout << errors.data() << std::endl;
     }
+
+	m_currentTimeLocation = m_shaderProgram.GetUniformLocation("CurrentTime");
 }
 
-void ParticlesApplication::EmitParticle(const glm::vec2& position, const float& size)
+void ParticlesApplication::EmitParticle(const glm::vec2& position, const float& size, const float& duration)
 {
     // Initialize the particle
+    // (todo) 02.X: Set the value for other attributes of the particle
     Particle particle;
     particle.position = position;
 	particle.size = size;
-    // (todo) 02.X: Set the value for other attributes of the particle
-
+	particle.birth = GetCurrentTime();
+	particle.duration = duration;
 
     // Get the index in the circular buffer
     unsigned int particleIndex = m_particleCount % m_particleCapacity;
