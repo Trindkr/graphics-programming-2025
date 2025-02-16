@@ -17,17 +17,19 @@ struct Particle
     float size;
     float birth;
     float duration;
+	Color color;
 
  
 };
 
 // List of attributes of the particle. Must match the structure above
-const std::array<VertexAttribute, 4> s_vertexAttributes =
+const std::array<VertexAttribute, 5> s_vertexAttributes =
 {
     VertexAttribute(Data::Type::Float, 2), // position
 	VertexAttribute(Data::Type::Float, 1), // size
 	VertexAttribute(Data::Type::Float, 1), // birth
-	VertexAttribute(Data::Type::Float, 1)  // duration
+	VertexAttribute(Data::Type::Float, 1),  // duration
+	VertexAttribute(Data::Type::Float, 4), // color
     // (todo) 02.X: Add more vertex attributes
 
 };
@@ -76,8 +78,9 @@ void ParticlesApplication::Update()
 
 		float randomSize = RandomRange(1.0f, 20.0f); //compute random size
 		float randomDuration = RandomRange(1.0f, 2.0f); //compute random duration
+		Color randomColor = RandomColor(); //compute random color
 		
-        EmitParticle(mousePosition, randomSize, randomDuration);
+        EmitParticle(mousePosition, randomSize, randomDuration, randomColor);
     }
 
     // save the mouse position (to compare next frame and obtain velocity)
@@ -160,7 +163,7 @@ void ParticlesApplication::InitializeShaders()
 	m_currentTimeLocation = m_shaderProgram.GetUniformLocation("CurrentTime");
 }
 
-void ParticlesApplication::EmitParticle(const glm::vec2& position, const float& size, const float& duration)
+void ParticlesApplication::EmitParticle(const glm::vec2& position, const float& size, const float& duration, const Color& color)
 {
     // Initialize the particle
     // (todo) 02.X: Set the value for other attributes of the particle
@@ -169,6 +172,7 @@ void ParticlesApplication::EmitParticle(const glm::vec2& position, const float& 
 	particle.size = size;
 	particle.birth = GetCurrentTime();
 	particle.duration = duration;
+	particle.color = color;
 
     // Get the index in the circular buffer
     unsigned int particleIndex = m_particleCount % m_particleCapacity;
