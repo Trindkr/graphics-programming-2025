@@ -138,7 +138,11 @@ void ParticlesApplication::InitializeShaders()
     // Attach shaders and link
     if (!m_shaderProgram.Build(vertexShader, fragmentShader))
     {
+        // Get errors in case of failure
+        std::array<char, 256> errors;
+        m_shaderProgram.GetLinkingErrors(errors);
         std::cout << "Error linking shaders" << std::endl;
+        std::cout << errors.data() << std::endl;
     }
 }
 
@@ -189,10 +193,7 @@ void ParticlesApplication::LoadAndCompileShader(Shader& shader, const char* path
     if (!shader.Compile())
     {
         // Get errors in case of failure
-        std::array<char, 256> errors;
-        shader.GetCompilationErrors(errors);
-        std::cout << "Error compiling shader: " << path << std::endl;
-        std::cout << errors.data() << std::endl;
+        std::cout << "Error linking shaders" << std::endl;
     }
 }
 
