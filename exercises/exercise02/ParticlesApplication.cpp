@@ -39,6 +39,9 @@ const std::array<VertexAttribute, 6> s_vertexAttributes =
 
 ParticlesApplication::ParticlesApplication()
     : Application(1024, 1024, "Particles demo")
+    , m_currentTimeUniform(0)
+    , m_gravityUniform(0)
+    , m_mousePosition(0)
     , m_particleCount(0)
     , m_particleCapacity(2048)  // You can change the capacity here to have more particles
 {

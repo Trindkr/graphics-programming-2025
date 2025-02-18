@@ -78,12 +78,7 @@ void ShaderProgram::AttachShader(const Shader& shader)
     assert(!IsLinked());
     assert(shader.IsValid());
     assert(shader.IsCompiled());
-
-    Handle shaderProgramHandle = GetHandle();
-    Handle shaderHandle = shader.GetHandle();
-
-    // Attach the shader to the shader program
-    glAttachShader(shaderProgramHandle, shaderHandle);
+    glAttachShader(GetHandle(), shader.GetHandle());
 }
 
 // Link currently attached shaders

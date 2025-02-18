@@ -11,24 +11,20 @@ layout (location = 5) in vec2 ParticleVelocity;
 //Add Color output variable here
 out vec4 Color;
 
-// (todo) 02.X: Add uniforms
 uniform float CurrentTime;
-uniform vec2 Gravity;
+uniform float Gravity;
 
 void main()
 {
 	Color = ParticleColor;
-	float lifeSpan = CurrentTime - ParticleBirth;
-	if (lifeSpan > ParticleDuration)
-	{
-		gl_PointSize = 0.0;
-		gl_Position = vec4(0.0, 0.0, 0.0, 0.0);
-		return;
-	}
+	float age = CurrentTime - ParticleBirth;
+	gl_PointSize = age < ParticleDuration ? ParticleSize : 0;
 
-    vec2 constantVelocity = vec2(0.0, 1.0); // Example constant velocity
-    vec2 position = ParticlePosition + ParticleVelocity * lifeSpan + 0.5 * Gravity * lifeSpan * lifeSpan + constantVelocity * lifeSpan;
-
-	gl_PointSize = ParticleSize;
+	// initial position (x0)
+	vec2 position = ParticlePosition;
+	// add velocity: initial velocity (v0) * age
+	position += ParticleVelocity * age;
+	// add gravity: 1/2  gravity (a) * age^2
+	position += 0.5f * vec2(0, Gravity) * age * age;
 	gl_Position = vec4(position, 0.0, 1.0);
 }
