@@ -172,7 +172,7 @@ void ParticlesApplication::InitializeShaders()
 
 }
 
-void ParticlesApplication::EmitParticle(const glm::vec2& position, const float& size, const float& duration, const Color& color, const glm::vec2& velocity)
+void ParticlesApplication::EmitParticle(const glm::vec2& position, float size, float duration, const Color& color, const glm::vec2& velocity)
 {
     // Initialize the particle
     // (todo) 02.X: Set the value for other attributes of the particle
