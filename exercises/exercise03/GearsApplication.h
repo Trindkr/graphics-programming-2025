@@ -38,6 +38,8 @@ private:
 
 private:
 
+    const float m_rotationSpeed = 1.0f;
+
     // Gear meshes
     Mesh m_largeGear;
     Mesh m_mediumGear;
@@ -48,8 +50,7 @@ private:
 
     // Shader uniform locations
     ShaderProgram::Location m_colorUniform;
-
-    // (todo) 03.1: Add the world matrix uniform
+	ShaderProgram::Location m_worldMatrixUniform;
 
 
     // (todo) 03.5: Add the viewProj matrix uniform
