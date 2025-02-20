@@ -50,20 +50,25 @@ void GearsApplication::Render()
 
     // (todo) 03.5: Set the view projection matrix from the camera. Once set, we will use it for all the objects
 
-
+    glm::mat4 centerGearMatrix(1.0f);
     float currentTime = static_cast<float>(glfwGetTime()); 
-	float rotationAngle = m_rotationSpeed * currentTime; // Rotate 1 degree per second
 
+
+
+	// Rotate the large gear
+	float largeGear_rotationAngle = m_rotationSpeed * currentTime; // Rotate 1 degree per second
 	glm::vec3 rotationAxis(0.0f, 0.0f, 1.0f);  // rotate around z
-    glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), rotationAngle, rotationAxis); 
 
-    // (todo) 03.1: Draw large gear at the center
-    //glm::mat4 centerGearMatrix(1.0f);
-
-    DrawGear(m_largeGear, rotationMatrix, Color(1.0f, 1.0f, 1.0f));
+    glm::mat4 largeGear_rotationMatrix = glm::rotate(glm::mat4(1.0f), largeGear_rotationAngle, rotationAxis);
+   
+	DrawGear(m_largeGear, largeGear_rotationMatrix, Color(1.0f, 1.0f, 1.0f)); // Draw large gear
 
     // (todo) 03.2: Draw medium gear to the right
+	float mediumGear_rotationAngle = m_rotationSpeed * currentTime * (16.0f / 8.0f);; // Rotate 1 degree per second. big gear has 16 cogs, medium gear has 8 cogs
 
+    glm::mat4 mediumGear_transformMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.75f, 0.0f, 0.0f)); // Translate to the right
+    mediumGear_transformMatrix = glm::rotate(mediumGear_transformMatrix, -mediumGear_rotationAngle, rotationAxis); // Rotate in the opposite direction
+	DrawGear(m_mediumGear, mediumGear_transformMatrix, Color(0.0f, 1.0f, 0.0f)); // Draw medium gear
 
     // (todo) 03.3: Draw small gear at the top-left corner
 
