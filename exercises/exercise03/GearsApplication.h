@@ -4,6 +4,7 @@
 
 #include <ituGL/shader/ShaderProgram.h>
 #include <ituGL/geometry/Mesh.h>
+#include <glm/gtx/transform.hpp>
 
 class GearsApplication : public Application
 {
@@ -39,6 +40,7 @@ private:
 private:
 
     const float m_rotationSpeed = 1.0f;
+	const float m_smallGearRotationOffset = glm::radians(8.5f); // Initial rotation offset for the gears
 
     // Gear meshes
     Mesh m_largeGear;

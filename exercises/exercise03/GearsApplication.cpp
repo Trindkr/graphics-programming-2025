@@ -61,7 +61,7 @@ void GearsApplication::Render()
    
 	DrawGear(m_largeGear, largeGear_rotationMatrix, Color(1.0f, 1.0f, 1.0f)); // Draw large gear
 
-    // (todo) 03.2: Draw medium gear to the right
+    //Draw medium gear to the right
 	float mediumGear_rotationAngle = m_rotationSpeed * currentTime * (16.0f / 8.0f);; // Rotate 1 degree per second. big gear has 16 cogs, medium gear has 8 cogs
     glm::mat4 mediumGear_transformMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.75f, 0.0f, 0.0f)); // Translate to the right
     mediumGear_transformMatrix = glm::rotate(mediumGear_transformMatrix, -mediumGear_rotationAngle, rotationAxis); // Rotate in the opposite direction
@@ -70,13 +70,18 @@ void GearsApplication::Render()
 
     //  Draw small gear at the top-left corner
 
-    float smallGear_rotationAngle = m_rotationSpeed * currentTime * (16.0f / 30.0f);;
+    float smallGear_rotationAngle = -m_rotationSpeed * currentTime * (16.0f / 30.0f);;
+	
 	glm::mat4 smallGear_transformMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(-1.0f, 1.0f, 0.0f)); // Translate to the top-left corner
     smallGear_transformMatrix = glm::scale(smallGear_transformMatrix, glm::vec3(7.5f, 7.5f, 0.0f)); // scale
-	smallGear_transformMatrix = glm::rotate(smallGear_transformMatrix, -smallGear_rotationAngle, rotationAxis); // Rotate
+	smallGear_transformMatrix = glm::rotate(smallGear_transformMatrix, smallGear_rotationAngle+m_smallGearRotationOffset, rotationAxis); // Rotate
+
+    //glm::mat4 smallGearTransformMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(-0.621f, 0.621f, 0.0f)); // Translate to the top-left corner
+    //smallGearTransformMatrix = glm::scale(smallGearTransformMatrix, glm::vec3(7.5f, 7.5f, 1.0f)); // Scale the small gear
+    //smallGearTransformMatrix = glm::rotate(smallGearTransformMatrix, smallGear_rotationAngle + initialRotationOffset, rotationAxis); // Rotate with offset
 
 	DrawGear(m_smallGear, smallGear_transformMatrix, Color(0.0f, 0.0f, 1.0f)); // Draw small gear
-    // (todo) 03.4: Draw small gear linked to the center gear
+    // Draw small gear linked to the center gear
 
 
     Application::Render();
