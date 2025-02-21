@@ -76,13 +76,14 @@ void GearsApplication::Render()
     smallGear_transformMatrix = glm::scale(smallGear_transformMatrix, glm::vec3(7.5f, 7.5f, 0.0f)); // scale
 	smallGear_transformMatrix = glm::rotate(smallGear_transformMatrix, smallGear_rotationAngle+m_smallGearRotationOffset, rotationAxis); // Rotate
 
-    //glm::mat4 smallGearTransformMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(-0.621f, 0.621f, 0.0f)); // Translate to the top-left corner
-    //smallGearTransformMatrix = glm::scale(smallGearTransformMatrix, glm::vec3(7.5f, 7.5f, 1.0f)); // Scale the small gear
-    //smallGearTransformMatrix = glm::rotate(smallGearTransformMatrix, smallGear_rotationAngle + initialRotationOffset, rotationAxis); // Rotate with offset
-
 	DrawGear(m_smallGear, smallGear_transformMatrix, Color(0.0f, 0.0f, 1.0f)); // Draw small gear
+    
     // Draw small gear linked to the center gear
+	glm::mat4 smallLinkedGear_transformMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.2f, 0.0f)); // Translate to the center
+    smallLinkedGear_transformMatrix = largeGear_rotationMatrix * smallLinkedGear_transformMatrix;
+    smallLinkedGear_transformMatrix = glm::rotate(smallLinkedGear_transformMatrix, smallGear_rotationAngle, rotationAxis);
 
+	DrawGear(m_smallGear, smallLinkedGear_transformMatrix, Color(1.0f, 0.0f, 0.0f)); // Draw small gear linked to the center gear
 
     Application::Render();
 }
