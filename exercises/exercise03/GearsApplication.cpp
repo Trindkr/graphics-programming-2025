@@ -43,12 +43,12 @@ void GearsApplication::Update()
     window.GetDimensions(width, height);
 	aspectRatio = static_cast<float>(width) / static_cast<float>(height); // Update aspect ratio 
     
-    // (todo) 03.5: Update the camera matrices
-	m_camera.SetOrthographicProjectionMatrix(glm::vec3(-aspectRatio, -1.0f, -5.0f), glm::vec3(aspectRatio, 1.0f, 5.0f));
-
+    // Update the camera matrices
+	//m_camera.SetOrthographicProjectionMatrix(glm::vec3(-aspectRatio, -1.0f, -5.0f), glm::vec3(aspectRatio, 1.0f, 5.0f));
+	m_camera.SetPerspectiveProjectionMatrix((3.1454/2.f), aspectRatio, 0.1f, 20.0f);
     glm::vec2 mousePosition = window.GetMousePosition(true);
 	glm::vec3 lookAt = glm::vec3(mousePosition.x, mousePosition.y, 0.0f); // Center of the scene
-	m_camera.SetViewMatrix(glm::vec3(0.0f, 0.0f, 1.0f), lookAt); // Set the camera position and look at the center of the scene
+	m_camera.SetViewMatrix(glm::vec3(0.0f, 0.5f, 1.5f), lookAt); // Set the camera position and look at the center of the scene
 }
 
 void GearsApplication::Render()
@@ -84,17 +84,17 @@ void GearsApplication::Render()
     float smallGear_rotationAngle = -m_rotationSpeed * currentTime * (16.0f / 30.0f);;
 	
 	glm::mat4 smallGear_transformMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(-1.0f, 1.0f, 0.0f)); // Translate to the top-left corner
-    smallGear_transformMatrix = glm::scale(smallGear_transformMatrix, glm::vec3(7.5f, 7.5f, 0.0f)); // scale
+    smallGear_transformMatrix = glm::scale(smallGear_transformMatrix, glm::vec3(7.5f, 7.5f, 7.5f)); // scale
 	smallGear_transformMatrix = glm::rotate(smallGear_transformMatrix, smallGear_rotationAngle+m_smallGearRotationOffset, rotationAxis); // Rotate
 
-	DrawGear(m_smallGear, smallGear_transformMatrix, Color(0.0f, 0.0f, 1.0f)); // Draw small gear
+	DrawGear(m_smallGear, smallGear_transformMatrix, Color(1.0f, 0.0f, 1.0f)); // Draw small gear
     
     // Draw small gear linked to the center gear
 	glm::mat4 smallLinkedGear_transformMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.2f, 0.0f)); // Translate to the center
     smallLinkedGear_transformMatrix = largeGear_rotationMatrix * smallLinkedGear_transformMatrix;
     smallLinkedGear_transformMatrix = glm::rotate(smallLinkedGear_transformMatrix, smallGear_rotationAngle, rotationAxis);
 
-	DrawGear(m_smallGear, smallLinkedGear_transformMatrix, Color(1.0f, 0.0f, 0.0f)); // Draw small gear linked to the center gear
+	DrawGear(m_smallGear, smallLinkedGear_transformMatrix, Color(1.f, 1.f, .2f)); // Draw small gear linked to the center gear
 
     Application::Render();
 }
