@@ -2,6 +2,6 @@
 
 int main()
 {
-    GearsApplication gearsApplication;
+    GearsApplication gearsApplication(1000,800);
     return gearsApplication.Run();
 }

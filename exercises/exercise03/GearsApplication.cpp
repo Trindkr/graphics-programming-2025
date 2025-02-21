@@ -3,6 +3,7 @@
 #include <ituGL/shader/Shader.h>
 #include <ituGL/shader/ShaderProgram.h>
 #include <ituGL/geometry/VertexFormat.h>
+#include <ituGL/camera/camera.h>
 #include <cassert>  // for asserts
 #include <array>    // to get shader error messages
 #include <fstream>  // shader loading
@@ -12,10 +13,14 @@
 #include <numbers>  // for PI constant
 #include <glm/gtx/transform.hpp>  // for matrix transformations
 
-GearsApplication::GearsApplication()
-    : Application(1024, 1024, "Gears demo")
+
+GearsApplication::GearsApplication(int width, int height)
+    : Application(width, height, "Gears demo")  // Use the defined width and height
     , m_colorUniform(-1)
+    , m_worldMatrixUniform(-1)
+    , m_viewProjMatrixUniform(-1)
 {
+	aspectRatio = static_cast<float>(width) / static_cast<float>(height);
 }
 
 void GearsApplication::Initialize()
@@ -34,10 +39,16 @@ void GearsApplication::Update()
     Application::Update();
 
     const Window& window = GetMainWindow();
-
+    int width, height;
+    window.GetDimensions(width, height);
+	aspectRatio = static_cast<float>(width) / static_cast<float>(height); // Update aspect ratio 
+    
     // (todo) 03.5: Update the camera matrices
+	m_camera.SetOrthographicProjectionMatrix(glm::vec3(-aspectRatio, -1.0f, -5.0f), glm::vec3(aspectRatio, 1.0f, 5.0f));
 
-
+    glm::vec2 mousePosition = window.GetMousePosition(true);
+	glm::vec3 lookAt = glm::vec3(mousePosition.x, mousePosition.y, 0.0f); // Center of the scene
+	m_camera.SetViewMatrix(glm::vec3(0.0f, 0.0f, 1.0f), lookAt); // Set the camera position and look at the center of the scene
 }
 
 void GearsApplication::Render()
@@ -48,7 +59,7 @@ void GearsApplication::Render()
     // Set our shader program
     m_shaderProgram.Use();
 
-    // (todo) 03.5: Set the view projection matrix from the camera. Once set, we will use it for all the objects
+    m_shaderProgram.SetUniform(m_viewProjMatrixUniform, m_camera.GetViewProjectionMatrix()); // Set the value of the ViewProjMatrix uniform
 
     glm::mat4 centerGearMatrix(1.0f);
     float currentTime = static_cast<float>(glfwGetTime()); 
@@ -116,10 +127,7 @@ void GearsApplication::InitializeShaders()
 
     m_colorUniform = m_shaderProgram.GetUniformLocation("Color");
     m_worldMatrixUniform = m_shaderProgram.GetUniformLocation("WorldMatrix");
-
-
-    // (todo) 03.5: Find the ViewProjMatrix uniform location
-
+    m_viewProjMatrixUniform = m_shaderProgram.GetUniformLocation("ViewProjMatrix");
 
 }
 
@@ -128,9 +136,7 @@ void GearsApplication::DrawGear(const Mesh& mesh, const glm::mat4& worldMatrix, 
 {
     m_shaderProgram.SetUniform(m_colorUniform, static_cast<glm::vec3>(color));
 	m_shaderProgram.SetUniform(m_worldMatrixUniform, worldMatrix); // Set the value of the WorldMatrix uniform
-    
-
-
+	
     mesh.DrawSubmesh(0);
 }
 

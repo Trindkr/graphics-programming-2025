@@ -5,11 +5,12 @@
 #include <ituGL/shader/ShaderProgram.h>
 #include <ituGL/geometry/Mesh.h>
 #include <glm/gtx/transform.hpp>
+#include <ituGL/camera/camera.h>
 
 class GearsApplication : public Application
 {
 public:
-    GearsApplication();
+    GearsApplication(int width, int height);
 
 protected:
     void Initialize() override;
@@ -39,6 +40,8 @@ private:
 
 private:
 
+    float aspectRatio;
+
     const float m_rotationSpeed = 1.0f;
 	const float m_smallGearRotationOffset = glm::radians(8.5f); // Initial rotation offset for the gears
 
@@ -51,13 +54,13 @@ private:
     ShaderProgram m_shaderProgram;
 
     // Shader uniform locations
-    ShaderProgram::Location m_colorUniform;
-	ShaderProgram::Location m_worldMatrixUniform;
+	ShaderProgram::Location m_colorUniform; // Color uniform
+	ShaderProgram::Location m_worldMatrixUniform; // World matrix uniform
+	ShaderProgram::Location m_viewProjMatrixUniform; //viewProj matrix uniform
 
+    
 
-    // (todo) 03.5: Add the viewProj matrix uniform
-
-
-    // (todo) 03.4: Add the camera
+	// Camera
+	Camera m_camera;
 
 };
