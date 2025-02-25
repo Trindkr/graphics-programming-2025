@@ -49,6 +49,19 @@ void GearsApplication::Update()
     glm::vec2 mousePosition = window.GetMousePosition(true);
 	glm::vec3 lookAt = glm::vec3(mousePosition.x, mousePosition.y, 0.0f); // Center of the scene
 	m_camera.SetViewMatrix(glm::vec3(0.0f, 0.5f, 1.5f), lookAt); // Set the camera position and look at the center of the scene
+    bool perspective = true;
+    if (perspective)
+    {
+        m_camera.SetPerspectiveProjectionMatrix(static_cast<float>(std::numbers::pi) * 0.5f, aspectRatio, 0.1f, 10.0f);
+    }
+    else
+    {
+        glm::vec3 halfSize(aspectRatio, 1.0f, 10.0f);
+        m_camera.SetOrthographicProjectionMatrix(-halfSize, halfSize);
+    }
+
+    glm::vec2 mousePosition = window.GetMousePosition(true);
+    m_camera.SetViewMatrix(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(mousePosition, 0.0f));
 }
 
 void GearsApplication::Render()
@@ -129,14 +142,19 @@ void GearsApplication::InitializeShaders()
     m_worldMatrixUniform = m_shaderProgram.GetUniformLocation("WorldMatrix");
     m_viewProjMatrixUniform = m_shaderProgram.GetUniformLocation("ViewProjMatrix");
 
+
+    // (todo) 03.5: Find the ViewProjMatrix uniform location
+
+
 }
 
-// Draw a gear mesh with a specific world matrix and color
-void GearsApplication::DrawGear(const Mesh& mesh, const glm::mat4& worldMatrix, const Color& color)
-{
-    m_shaderProgram.SetUniform(m_colorUniform, static_cast<glm::vec3>(color));
 	m_shaderProgram.SetUniform(m_worldMatrixUniform, worldMatrix); // Set the value of the WorldMatrix uniform
 	
+    m_shaderProgram.SetUniform(m_colorUniform, static_cast<glm::vec3>(color));
+
+    // (todo) 03.1: Set the value of the WorldMatrix uniform
+
+
     mesh.DrawSubmesh(0);
 }
 
