@@ -7,6 +7,7 @@ layout (location = 2) in vec2 VertexTexCoord;
 out vec3 WorldPosition;
 out vec3 WorldNormal;
 out vec2 TexCoord;
+out float Height;
 
 uniform mat4 WorldMatrix;
 uniform mat4 ViewProjMatrix;
@@ -20,4 +21,5 @@ void main()
 	TexCoord = VertexTexCoord;
 	
 	gl_Position = ViewProjMatrix * vec4(WorldPosition, 1.0);
+	Height = height.x;
 }

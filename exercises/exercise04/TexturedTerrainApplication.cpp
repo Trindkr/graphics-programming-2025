@@ -117,6 +117,9 @@ void TexturedTerrainApplication::InitializeTextures()
 {
 	m_defaultTexture = CreateDefaultTexture();
 	m_grassTexture = LoadTexture("textures/grass.jpg");
+	m_dirtTexture = LoadTexture("textures/dirt.png");
+	m_rockTexture = LoadTexture("textures/rock.jpg");
+	m_snowTexture = LoadTexture("textures/snow.jpg");
 
 	for (int i = 0; i < 4; ++i)
 	{
@@ -154,13 +157,21 @@ void TexturedTerrainApplication::InitializeMaterials()
 	// Terrain material
 
 	m_terrainMaterials.resize(4);
-	
+
 
 	m_terrainMaterials[0] = std::make_shared<Material>(terrainShaderProgram);
-	m_terrainMaterials[0]->SetUniformValue("ColorTexture", m_grassTexture);
+	m_terrainMaterials[0]->SetUniformValue("GrassTexture", m_grassTexture);
+	m_terrainMaterials[0]->SetUniformValue("DirtTexture", m_dirtTexture);
+	m_terrainMaterials[0]->SetUniformValue("RockTexture", m_rockTexture);
+	m_terrainMaterials[0]->SetUniformValue("SnowTexture", m_snowTexture);
 	m_terrainMaterials[0]->SetUniformValue("ColorTextureScale", glm::vec2(0.05f));
 	m_terrainMaterials[0]->SetUniformValue("Color", glm::vec4(1.0f));
-	m_terrainMaterials[0]->SetUniformValue("Heightmap", m_heightMapTextures[0]);
+	m_terrainMaterials[0]->SetUniformValue("GrassHeightRange", glm::vec2(0.3f, 0.4f));
+	m_terrainMaterials[0]->SetUniformValue("RockHeightRange", glm::vec2(0.4f, 0.6f));
+	m_terrainMaterials[0]->SetUniformValue("SnowHeightRange", glm::vec2(0.6f, 0.8f));
+
+
+
 
 	Material material = Material(*m_terrainMaterials[0].get());
 
@@ -169,8 +180,9 @@ void TexturedTerrainApplication::InitializeMaterials()
 		m_terrainMaterials[i] = std::make_shared<Material>(material);
 		m_terrainMaterials[i]->SetUniformValue("Heightmap", m_heightMapTextures[i]);
 	}
-	
-	
+
+	m_terrainMaterials[0]->SetUniformValue("Heightmap", m_heightMapTextures[0]);
+
 
 	// (todo) 04.5: Add water shader and material here
 
@@ -227,7 +239,7 @@ std::shared_ptr<Texture2DObject> TexturedTerrainApplication::LoadTexture(const c
 
 	texture->Bind();
 	texture->SetImage(0, width, height, TextureObject::FormatRGBA, TextureObject::InternalFormatRGBA, std::span<const unsigned char>(data, width * height * 4));
-	
+
 
 	// Generate mipmaps
 	texture->GenerateMipmap();
@@ -242,6 +254,9 @@ std::shared_ptr<Texture2DObject> TexturedTerrainApplication::CreateHeightMap(uns
 {
 	std::shared_ptr<Texture2DObject> heightmap = std::make_shared<Texture2DObject>();
 
+	float minHeight = std::numeric_limits<float>::max();
+	float maxHeight = std::numeric_limits<float>::lowest();
+
 	std::vector<float> pixels;
 	for (unsigned int j = 0; j < height; ++j)
 	{
@@ -254,7 +269,11 @@ std::shared_ptr<Texture2DObject> TexturedTerrainApplication::CreateHeightMap(uns
 
 			//float z = std::sin(0.1f * i) * 0.1f;
 
+			if (z < minHeight) minHeight = z;
+			if (z > maxHeight) maxHeight = z;
+
 			pixels.push_back(z);
+
 		}
 	}
 
