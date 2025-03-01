@@ -40,7 +40,7 @@ void TexturedTerrainApplication::Initialize()
 	GetDevice().EnableFeature(GL_DEPTH_TEST);
 
 	//Enable wireframe
-	GetDevice().SetWireframeEnabled(true);
+	//GetDevice().SetWireframeEnabled(true);
 }
 
 void TexturedTerrainApplication::Update()
@@ -116,6 +116,7 @@ void TexturedTerrainApplication::Render()
 void TexturedTerrainApplication::InitializeTextures()
 {
 	m_defaultTexture = CreateDefaultTexture();
+	m_grassTexture = LoadTexture("textures/grass.jpg");
 
 	for (int i = 0; i < 4; ++i)
 	{
@@ -153,12 +154,23 @@ void TexturedTerrainApplication::InitializeMaterials()
 	// Terrain material
 
 	m_terrainMaterials.resize(4);
-	for (int i = 0; i < 4; ++i)
+	
+
+	m_terrainMaterials[0] = std::make_shared<Material>(terrainShaderProgram);
+	m_terrainMaterials[0]->SetUniformValue("ColorTexture", m_grassTexture);
+	m_terrainMaterials[0]->SetUniformValue("ColorTextureScale", glm::vec2(0.05f));
+	m_terrainMaterials[0]->SetUniformValue("Color", glm::vec4(1.0f));
+	m_terrainMaterials[0]->SetUniformValue("Heightmap", m_heightMapTextures[0]);
+
+	Material material = Material(*m_terrainMaterials[0].get());
+
+	for (int i = 1; i < 4; ++i)
 	{
-		m_terrainMaterials[i] = std::make_shared<Material>(terrainShaderProgram);
-		m_terrainMaterials[i]->SetUniformValue("Color", glm::vec4(1.0f));
+		m_terrainMaterials[i] = std::make_shared<Material>(material);
 		m_terrainMaterials[i]->SetUniformValue("Heightmap", m_heightMapTextures[i]);
 	}
+	
+	
 
 	// (todo) 04.5: Add water shader and material here
 
@@ -204,17 +216,24 @@ std::shared_ptr<Texture2DObject> TexturedTerrainApplication::LoadTexture(const c
 	int components = 0;
 
 
-	// (todo) 04.3: Load the texture data here
-	unsigned char* data = nullptr;
+	// Load the texture data here
+	unsigned char* data = stbi_load(path, &width, &height, &components, 4);
+
+	if (data == nullptr)
+	{
+		std::cerr << "Failed to load texture: " << path << std::endl;
+		return nullptr;
+	}
 
 	texture->Bind();
 	texture->SetImage(0, width, height, TextureObject::FormatRGBA, TextureObject::InternalFormatRGBA, std::span<const unsigned char>(data, width * height * 4));
+	
 
-	// (todo) 04.3: Generate mipmaps
+	// Generate mipmaps
+	texture->GenerateMipmap();
 
-
-	// (todo) 04.3: Release texture data
-
+	// Release texture data
+	stbi_image_free(data);
 
 	return texture;
 }
