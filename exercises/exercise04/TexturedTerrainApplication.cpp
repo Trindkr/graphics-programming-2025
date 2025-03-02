@@ -101,15 +101,25 @@ void TexturedTerrainApplication::Render()
 	glm::mat4 t3 = glm::translate(glm::vec3(-1.0f, 0, 0));
 	glm::mat4 t4 = glm::translate(glm::vec3(0, 0, 0));
 
+	float waterLevel = 0.35f;
 
+	glm::mat4 t1_1 = glm::translate(glm::vec3(0, waterLevel, -1.0f));
+	glm::mat4 t2_1 = glm::translate(glm::vec3(-1.0f, waterLevel, -1.0f));
+	glm::mat4 t3_1 = glm::translate(glm::vec3(-1.0f, waterLevel, 0));
+	glm::mat4 t4_1 = glm::translate(glm::vec3(0, waterLevel, 0));
+
+	// Draw terrain planes
 	DrawObject(m_terrainPatch, *m_terrainMaterials[1], scale * t1);
 	DrawObject(m_terrainPatch, *m_terrainMaterials[3], scale * t2);
 	DrawObject(m_terrainPatch, *m_terrainMaterials[2], scale * t3);
 	DrawObject(m_terrainPatch, *m_terrainMaterials[0], scale * t4);
 
 
-	// Water patches
-	// (todo) 04.5: Add water planes
+	//Add water planes
+	DrawObject(m_terrainPatch, *m_waterMaterial, scale * t1_1);
+	DrawObject(m_terrainPatch, *m_waterMaterial, scale * t2_1);
+	DrawObject(m_terrainPatch, *m_waterMaterial, scale * t3_1);
+	DrawObject(m_terrainPatch, *m_waterMaterial, scale * t4_1);
 
 }
 
@@ -126,11 +136,7 @@ void TexturedTerrainApplication::InitializeTextures()
 		m_heightMapTextures.push_back(CreateHeightMap(m_gridX, m_gridY, coords[i]));
 	}
 
-
-	// (todo) 04.3: Load terrain textures here
-
-
-	// (todo) 04.5: Load water texture here
+	m_waterTexture = LoadTexture("textures/water.png");
 
 }
 
@@ -154,10 +160,12 @@ void TexturedTerrainApplication::InitializeMaterials()
 	std::shared_ptr<ShaderProgram> terrainShaderProgram = std::make_shared<ShaderProgram>();
 	terrainShaderProgram->Build(terrainVS, terrainFS);
 
+
+	
+
 	// Terrain material
 
 	m_terrainMaterials.resize(4);
-
 
 	m_terrainMaterials[0] = std::make_shared<Material>(terrainShaderProgram);
 	m_terrainMaterials[0]->SetUniformValue("GrassTexture", m_grassTexture);
@@ -171,8 +179,6 @@ void TexturedTerrainApplication::InitializeMaterials()
 	m_terrainMaterials[0]->SetUniformValue("SnowHeightRange", glm::vec2(0.6f, 0.8f));
 
 
-
-
 	Material material = Material(*m_terrainMaterials[0].get());
 
 	for (int i = 1; i < 4; ++i)
@@ -183,10 +189,21 @@ void TexturedTerrainApplication::InitializeMaterials()
 
 	m_terrainMaterials[0]->SetUniformValue("Heightmap", m_heightMapTextures[0]);
 
+	//Add water shader and material here
 
-	// (todo) 04.5: Add water shader and material here
+	// Water shader program
+	Shader waterVS = m_vertexShaderLoader.Load("shaders/water.vert");
+	Shader waterFS = m_fragmentShaderLoader.Load("shaders/water.frag");
+	std::shared_ptr<ShaderProgram> waterShaderProgram = std::make_shared<ShaderProgram>();
+	waterShaderProgram->Build(waterVS, waterFS);
 
-
+	// Water material
+	m_waterMaterial = std::make_shared<Material>(waterShaderProgram);
+	m_waterMaterial->SetUniformValue("WaterTexture", m_waterTexture);
+	m_waterMaterial->SetUniformValue("ColorTextureScale", glm::vec2(0.05f));
+	m_waterMaterial->SetUniformValue("Color", glm::vec4(1.0f, 1.0f, 1.0f, .5f));
+	m_waterMaterial->SetBlendEquation(Material::BlendEquation::Add);
+	m_waterMaterial->SetBlendParams(Material::BlendParam::SourceAlpha, Material::BlendParam::OneMinusSourceAlpha);
 }
 
 void TexturedTerrainApplication::InitializeMeshes()
