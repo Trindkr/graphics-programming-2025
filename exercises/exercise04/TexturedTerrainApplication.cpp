@@ -162,6 +162,8 @@ void TexturedTerrainApplication::InitializeMaterials()
 
 
 	
+    m_terrainMaterial01 = std::make_shared<Material>(*m_terrainMaterial00);
+    m_terrainMaterial01->SetUniformValue("Heightmap", m_heightmapTexture01);
 
 	// Terrain material
 
@@ -178,6 +180,11 @@ void TexturedTerrainApplication::InitializeMaterials()
 	m_terrainMaterials[0]->SetUniformValue("RockHeightRange", glm::vec2(0.4f, 0.6f));
 	m_terrainMaterials[0]->SetUniformValue("SnowHeightRange", glm::vec2(0.6f, 0.8f));
 
+    // Water shader
+    Shader waterVS = m_vertexShaderLoader.Load("shaders/water.vert");
+    Shader waterFS = m_fragmentShaderLoader.Load("shaders/water.frag");
+    std::shared_ptr<ShaderProgram> waterShaderProgram = std::make_shared<ShaderProgram>();
+    waterShaderProgram->Build(waterVS, waterFS);
 
 	Material material = Material(*m_terrainMaterials[0].get());
 

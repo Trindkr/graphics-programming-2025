@@ -48,6 +48,11 @@ private:
 	std::vector<std::shared_ptr<Material>> m_terrainMaterials;
 	std::shared_ptr<Material> m_waterMaterial;
 	std::shared_ptr<Material> m_defaultMaterial;
+    std::shared_ptr<Material> m_terrainMaterial00;
+    std::shared_ptr<Material> m_terrainMaterial10;
+    std::shared_ptr<Material> m_terrainMaterial01;
+    std::shared_ptr<Material> m_terrainMaterial11;
+    std::shared_ptr<Material> m_waterMaterial;
 
 
 	// (todo) 04.X: Add additional textures
