@@ -9,8 +9,6 @@ out vec4 FragColor;
 uniform sampler2D WaterTexture;
 uniform vec2 ColorTextureScale;
 uniform vec4 Color;
-uniform sampler2D ColorTexture;
-uniform vec2 ColorTextureScale;
 
 void main()
 {
