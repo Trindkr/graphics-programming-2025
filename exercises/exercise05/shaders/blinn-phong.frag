@@ -16,6 +16,11 @@ uniform float DiffuseReflection;
 uniform vec3 LightColor;
 uniform vec3 LightPosition;
 
+uniform float SpecularReflection;
+uniform float SpecularExponent;
+
+uniform vec3 CameraPosition;
+
 vec3 GetAmbientReflection(vec4 color)
 {
 
@@ -27,10 +32,15 @@ vec3 GetDiffuseReflection(vec4 color, vec3 lightDirection, vec3 worldNormal)
 	return LightColor * DiffuseReflection * color.rgb * clamp(dot(worldNormal, lightDirection), 0, 1);
 }
 
-vec3 GetBlinnPhongReflection(vec4 color, vec3 lightDirection, vec3 worldNormal)
+vec3 GetSpecularReflection(vec3 halfVector)
+{
+	return LightColor * SpecularReflection * pow(clamp(dot(WorldNormal, halfVector), 0, 1), SpecularExponent);
+}
+
+vec3 GetBlinnPhongReflection(vec4 color, vec3 lightDirection, vec3 worldNormal, vec3 halfVector)
 {
 
-	return GetAmbientReflection(color) + GetDiffuseReflection(color, lightDirection, worldNormal);
+	return GetAmbientReflection(color) + GetDiffuseReflection(color, lightDirection, worldNormal) + GetSpecularReflection(halfVector);
 }
 
 void main()
@@ -38,9 +48,11 @@ void main()
 
 	vec3 lightDirection = normalize(LightPosition - WorldPosition);
 	vec3 worldNormal = normalize(WorldNormal);
+	vec3 viewVector = normalize(CameraPosition - WorldPosition);
+	vec3 halfVector = normalize(lightDirection + viewVector);
 
 	vec4 color = texture(ColorTexture, TexCoord) * Color;
-	vec3 blinnPhongReflection = GetBlinnPhongReflection(color, lightDirection, worldNormal);
+	vec3 blinnPhongReflection = GetBlinnPhongReflection(color, lightDirection, worldNormal, halfVector);
 	FragColor = vec4(blinnPhongReflection, 1);
 }
 
