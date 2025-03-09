@@ -16,6 +16,7 @@ ViewerApplication::ViewerApplication()
     , m_cameraEnabled(false)
     , m_cameraEnablePressed(false)
     , m_mousePosition(GetMainWindow().GetMousePosition(true))
+	, m_ambientColor(0.25f)
 {
 }
 
@@ -64,8 +65,11 @@ void ViewerApplication::Cleanup()
 void ViewerApplication::InitializeModel()
 {
     // Load and build shader
-    Shader vertexShader = ShaderLoader::Load(Shader::VertexShader, "shaders/unlit.vert");
-    Shader fragmentShader = ShaderLoader::Load(Shader::FragmentShader, "shaders/unlit.frag");
+    //Shader vertexShader = ShaderLoader::Load(Shader::VertexShader, "shaders/unlit.vert");
+    //Shader fragmentShader = ShaderLoader::Load(Shader::FragmentShader, "shaders/unlit.frag");
+
+    Shader vertexShader = ShaderLoader::Load(Shader::VertexShader, "shaders/blinn-phong.vert");
+    Shader fragmentShader = ShaderLoader::Load(Shader::FragmentShader, "shaders/blinn-phong.frag");
     std::shared_ptr<ShaderProgram> shaderProgram = std::make_shared<ShaderProgram>();
     shaderProgram->Build(vertexShader, fragmentShader);
 
@@ -73,20 +77,25 @@ void ViewerApplication::InitializeModel()
     ShaderUniformCollection::NameSet filteredUniforms;
     filteredUniforms.insert("WorldMatrix");
     filteredUniforms.insert("ViewProjMatrix");
+    filteredUniforms.insert("AmbientColor");
 
     // Create reference material
     std::shared_ptr<Material> material = std::make_shared<Material>(shaderProgram, filteredUniforms);
     material->SetUniformValue("Color", glm::vec4(1.0f));
+	material->SetUniformValue("AmbientReflection", 1.0f);
 
     // Setup function
+
     ShaderProgram::Location worldMatrixLocation = shaderProgram->GetUniformLocation("WorldMatrix");
     ShaderProgram::Location viewProjMatrixLocation = shaderProgram->GetUniformLocation("ViewProjMatrix");
-    material->SetShaderSetupFunction([=](ShaderProgram& shaderProgram)
+	ShaderProgram::Location ambientColorLocation = shaderProgram->GetUniformLocation("AmbientColor");
+    material->SetShaderSetupFunction([=](ShaderProgram& shaderProgram) 
         {
-            shaderProgram.SetUniform(worldMatrixLocation, glm::scale(glm::vec3(0.1f)));
+            //Set camera and light uniforms
+            shaderProgram.SetUniform(worldMatrixLocation, glm::scale(glm::vec3(0.1f))); 
             shaderProgram.SetUniform(viewProjMatrixLocation, m_camera.GetViewProjectionMatrix());
+			shaderProgram.SetUniform(ambientColorLocation, m_ambientColor);
 
-            // (todo) 05.X: Set camera and light uniforms
 
 
         });
