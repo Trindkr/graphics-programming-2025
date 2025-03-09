@@ -91,16 +91,34 @@ void ViewerApplication::InitializeModel()
 
         });
 
-    // Configure loader
+    // Configure model loader
     ModelLoader loader(material);
     loader.SetMaterialAttribute(VertexAttribute::Semantic::Position, "VertexPosition");
     loader.SetMaterialAttribute(VertexAttribute::Semantic::Normal, "VertexNormal");
     loader.SetMaterialAttribute(VertexAttribute::Semantic::TexCoord0, "VertexTexCoord");
 
+	loader.SetCreateMaterials(true);
+   
     // Load model
     m_model = loader.Load("models/mill/Mill.obj");
-
+    
     // (todo) 05.1: Load and set textures
+
+	// Configure texture loader
+    Texture2DLoader textureLoader(TextureObject::Format::FormatRGBA, TextureObject::InternalFormat::InternalFormatRGBA8);
+    textureLoader.SetGenerateMipmap(true);
+	textureLoader.SetFlipVertical(true);
+
+	// Load textures
+	std::shared_ptr<Texture2DObject> millTexture = textureLoader.LoadShared("models/mill/MillCat_color.jpg");
+    std::shared_ptr<Texture2DObject> groundColorTexture = textureLoader.LoadShared("models/mill/Ground_color.jpg");
+    std::shared_ptr<Texture2DObject> groundShadowTexture = textureLoader.LoadShared("models/mill/Ground_shadow.jpg");
+
+	m_model.GetMaterial(0).SetUniformValue("ColorTexture", groundShadowTexture); 
+	m_model.GetMaterial(1).SetUniformValue("ColorTexture", groundColorTexture); 
+	m_model.GetMaterial(2).SetUniformValue("ColorTexture", millTexture);
+
+
 
 }
 
