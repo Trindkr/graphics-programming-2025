@@ -53,7 +53,7 @@ void ViewerApplication::Render()
 
     // Clear color and depth
     GetDevice().Clear(true, Color(0.0f, 0.0f, 0.0f, 1.0f), true, 1.0f);
-
+	RenderGUI();
     m_model.Draw();
 }
 
@@ -165,7 +165,15 @@ void ViewerApplication::RenderGUI()
 {
     m_imGui.BeginFrame();
 
-    // (todo) 05.4: Add debug controls for light properties
+    //Add debug controls for light properties
+	if (ImGui::CollapsingHeader("Light properties"))
+	{
+		ImGui::ColorEdit3("Ambient color", &m_ambientColor[0]);
+		ImGui::ColorEdit3("Light color", &m_lightColor[0]);
+		ImGui::SliderFloat("Light intensity", &m_lightIntensity, 0.0f, 10.0f);
+		ImGui::SliderFloat3("Light position", &m_lightPosition[0], -100.0f, 100.0f);
+	}
+
 
     m_imGui.EndFrame();
 }
