@@ -40,11 +40,12 @@ void GBufferRenderPass::InitFramebuffer()
 
 void GBufferRenderPass::InitTextures(int width, int height)
 {
-    // (todo) 07.4: Depth: Set the min and magfilter as nearest
+    //07.4: Depth: Set the min and magfilter as nearest
     m_depthTexture = std::make_shared<Texture2DObject>();
     m_depthTexture->Bind();
     m_depthTexture->SetImage(0, width, height, TextureObject::FormatDepth, TextureObject::InternalFormatDepth);
-
+	m_depthTexture->SetParameter(TextureObject::ParameterEnum::MinFilter, GL_NEAREST);
+	m_depthTexture->SetParameter(TextureObject::ParameterEnum::MagFilter, GL_NEAREST);
 
     //07.2: Albedo: Bind the newly created texture, set the image, and the min and magfilter as nearest
     m_albedoTexture = std::make_shared<Texture2DObject>();
@@ -62,6 +63,7 @@ void GBufferRenderPass::InitTextures(int width, int height)
         
     // (todo) 07.5: Others: Bind the newly created texture, set the image and the min and magfilter as nearest
     m_othersTexture = std::make_shared<Texture2DObject>();
+
 
 
     Texture2DObject::Unbind();

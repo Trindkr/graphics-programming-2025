@@ -36,7 +36,27 @@ vec3 GetImplicitNormal(vec2 normal)
 // Obtains a position in view space using the depth buffer and the inverse projection matrix
 vec3 ReconstructViewPosition(sampler2D depthTexture, vec2 texCoord, mat4 invProjMatrix)
 {
-	// (todo) 07.4: Reconstruct the position, using the screen texture coordinates and the depth
-	return vec3(0);
+	//07.4: Reconstruct the position, using the screen texture coordinates and the depth
+
+	// Sample the depth value from the texture
+	float depth = texture(depthTexture, texCoord).r;
+
+	// Renormalize the depth value to the range (-1, 1)
+    float normalizedDepth = depth * 2.0 - 1.0;
+
+	// Normalize the texture coordinates to the range (-1, 1)
+    vec2 normalizedTexCoord = texCoord * 2.0 - 1.0;
+
+	// Create the clip space position
+    vec4 clipSpacePosition = vec4(normalizedTexCoord, normalizedDepth, 1.0);
+
+    // Transform the clip space position to view space using the inverse projection matrix
+    vec4 viewSpacePosition = invProjMatrix * clipSpacePosition;
+
+    // Perform perspective divide to get the view space position
+    viewSpacePosition /= viewSpacePosition.w;
+
+    return viewSpacePosition.xyz;
+
 }
 
