@@ -19,6 +19,9 @@ uniform float SpecularExponent;
 void main()
 {
 	FragAlbedo = texture(ColorTexture, TexCoord)* vec4(Color,1.0);
+	
 	FragNormal = ViewNormal.xy;
-	FragOthers = vec4(0.0f);
+	
+	float w = 1 / (1 + SpecularExponent);
+	FragOthers = vec4(AmbientReflectance, DiffuseReflectance, SpecularReflectance, w);
 }
