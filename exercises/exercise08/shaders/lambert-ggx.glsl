@@ -51,16 +51,20 @@ float DistributionGGX(vec3 normal, vec3 halfDir, float roughness)
 	//08.5: Implement the equation
 	float a = pow(roughness,2.0f);
 	float b = pow(dot(normal, halfDir),2.0f) * (a-1.0f) + 1.0f;
-	float dert = Pi * (pow(b,2.0f));
+	float denominator  = Pi * (pow(b,2.0f));
 
-	return a/dert;
+	return a/denominator;
 }
 
 // Geometry term in one direction, for GGX equation
 float GeometrySchlickGGX(float cosAngle, float roughness)
 {
-	// (todo) 08.6: Implement the equation
-	return 1.0f;
+	//08.6: Implement the equation
+	float a = pow(roughness,2.0f);
+	float numerator = 2.0f * cosAngle;
+	float denominator = cosAngle + sqrt(a + (1.0f - a) * pow(cosAngle,2.0f));
+
+	return numerator/denominator;
 }
 
 // Geometry term in both directions, following Smith simplification, that divides it in the product of both directions
@@ -102,10 +106,10 @@ vec3 ComputeSpecularIndirectLighting(SurfaceData data, vec3 viewDir)
 	vec3 environmentReflection = SampleEnvironment(reflection, pow(data.roughness, 0.25f));
 	
 
-	// (todo) 08.6: Add a geometry term to the indirect specular
+	//08.6: Add a geometry term to the indirect specular
+	float geometry = GeometrySmith(data.normal, reflection, viewDir, data.roughness);
 
-
-	return environmentReflection;
+	return environmentReflection * geometry;
 }
 
 vec3 CombineIndirectLighting(vec3 diffuse, vec3 specular, SurfaceData data, vec3 viewDir)
@@ -133,9 +137,9 @@ vec3 ComputeSpecularLighting(SurfaceData data, vec3 lightDir, vec3 viewDir)
 
 	float D = DistributionGGX(data.normal, halfDir, data.roughness);
 	float G = GeometrySmith(data.normal, lightDir, viewDir, data.roughness);
-	float dert = 4.0f * ClampedDot(data.normal, viewDir) * ClampedDot(data.normal, lightDir) + 0.000001f;
+	float denominator = 4.0f * ClampedDot(data.normal, viewDir) * ClampedDot(data.normal, lightDir) + 0.000001f;
 
-	return vec3((D * G) / dert);
+	return vec3((D * G) / denominator);
 }
 
 vec3 CombineLighting(vec3 diffuse, vec3 specular, SurfaceData data, vec3 lightDir, vec3 viewDir)
