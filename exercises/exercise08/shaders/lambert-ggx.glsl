@@ -89,16 +89,17 @@ vec3 ComputeDiffuseIndirectLighting(SurfaceData data)
 
 vec3 ComputeSpecularIndirectLighting(SurfaceData data, vec3 viewDir)
 {
-	// (todo) 08.2: Compute the reflection vector with the viewDir and the normal
+	//08.2: Compute the reflection vector with the viewDir and the normal
+	vec3 reflection = reflect(-viewDir, data.normal);
 
-
-	// (todo) 08.2: Sample the environment map using the reflection vector, at a specific LOD level
-
+	//08.2: Sample the environment map using the reflection vector, at a specific LOD level
+	vec3 environmentReflection = SampleEnvironment(reflection, pow(data.roughness, 0.25f));
+	
 
 	// (todo) 08.6: Add a geometry term to the indirect specular
 
 
-	return vec3(0.0f);
+	return environmentReflection;
 }
 
 vec3 CombineIndirectLighting(vec3 diffuse, vec3 specular, SurfaceData data, vec3 viewDir)
