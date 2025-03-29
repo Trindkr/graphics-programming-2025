@@ -48,8 +48,12 @@ vec3 FresnelSchlick(vec3 f0, vec3 viewDir, vec3 halfDir)
 // GGX equation for distribution function
 float DistributionGGX(vec3 normal, vec3 halfDir, float roughness)
 {
-	// (todo) 08.5: Implement the equation
-	return 0.0f;
+	//08.5: Implement the equation
+	float a = pow(roughness,2.0f);
+	float b = pow(dot(normal, halfDir),2.0f) * (a-1.0f) + 1.0f;
+	float dert = Pi * (pow(b,2.0f));
+
+	return a/dert;
 }
 
 // Geometry term in one direction, for GGX equation
@@ -124,8 +128,14 @@ vec3 ComputeDiffuseLighting(SurfaceData data, vec3 lightDir)
 
 vec3 ComputeSpecularLighting(SurfaceData data, vec3 lightDir, vec3 viewDir)
 {
-	// (todo) 08.5: Implement the Cook-Torrance equation using the D (distribution) and G (geometry) terms
-	return vec3(0.0f);
+	//08.5: Implement the Cook-Torrance equation using the D (distribution) and G (geometry) terms
+	vec3 halfDir = normalize(lightDir + viewDir);
+
+	float D = DistributionGGX(data.normal, halfDir, data.roughness);
+	float G = GeometrySmith(data.normal, lightDir, viewDir, data.roughness);
+	float dert = 4.0f * ClampedDot(data.normal, viewDir) * ClampedDot(data.normal, lightDir) + 0.000001f;
+
+	return vec3((D * G) / dert);
 }
 
 vec3 CombineLighting(vec3 diffuse, vec3 specular, SurfaceData data, vec3 lightDir, vec3 viewDir)
