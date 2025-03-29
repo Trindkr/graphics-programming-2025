@@ -117,10 +117,9 @@ vec3 CombineIndirectLighting(vec3 diffuse, vec3 specular, SurfaceData data, vec3
 
 vec3 ComputeDiffuseLighting(SurfaceData data, vec3 lightDir)
 {
-	// (todo) 08.4: Implement the lambertian equation for diffuse
+	//08.4: Implement the lambertian equation for diffuse
 
-	float incidence = ClampedDot(data.normal, lightDir);
-	return GetAlbedo(data) * incidence;
+	return GetAlbedo(data);
 }
 
 vec3 ComputeSpecularLighting(SurfaceData data, vec3 lightDir, vec3 viewDir)
@@ -138,7 +137,8 @@ vec3 CombineLighting(vec3 diffuse, vec3 specular, SurfaceData data, vec3 lightDi
 	//08.3: Linearly interpolate between the diffuse and specular term, using the fresnel value
 	vec3 interpolatedLighting = mix(diffuse, specular, fresnel);
 
-	// (todo) 08.4: Move the incidence factor to affect the combined light value
+	//08.4: Move the incidence factor to affect the combined light value
+	float incidence = ClampedDot(data.normal, lightDir);
 
-	return interpolatedLighting;
+	return interpolatedLighting * incidence/Pi;
 }
