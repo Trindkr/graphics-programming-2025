@@ -203,14 +203,14 @@ void SceneViewerApplication::InitializeModels()
     loader.SetMaterialProperty(ModelLoader::MaterialProperty::SpecularTexture, "SpecularTexture");
 
     // Load models
-    //std::shared_ptr<Model> chestModel = loader.LoadShared("models/treasure_chest/treasure_chest.obj");
-    //m_scene.AddSceneNode(std::make_shared<SceneModel>("treasure chest", chestModel));
+    std::shared_ptr<Model> chestModel = loader.LoadShared("models/treasure_chest/treasure_chest.obj");
+    m_scene.AddSceneNode(std::make_shared<SceneModel>("treasure chest", chestModel));
 
-    std::shared_ptr<Model> cameraModel = loader.LoadShared("models/camera/camera.obj");
-    m_scene.AddSceneNode(std::make_shared<SceneModel>("camera model", cameraModel));
+    //std::shared_ptr<Model> cameraModel = loader.LoadShared("models/camera/camera.obj");
+    //m_scene.AddSceneNode(std::make_shared<SceneModel>("camera model", cameraModel));
 
-    //std::shared_ptr<Model> teaSetModel = loader.LoadShared("models/tea_set/tea_set.obj");
-    //m_scene.AddSceneNode(std::make_shared<SceneModel>("tea set", teaSetModel));
+    std::shared_ptr<Model> teaSetModel = loader.LoadShared("models/tea_set/tea_set.obj");
+    m_scene.AddSceneNode(std::make_shared<SceneModel>("tea set", teaSetModel));
 
     //std::shared_ptr<Model> clockModel = loader.LoadShared("models/alarm_clock/alarm_clock.obj");
     //m_scene.AddSceneNode(std::make_shared<SceneModel>("alarm clock", clockModel));
