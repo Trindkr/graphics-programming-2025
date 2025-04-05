@@ -70,6 +70,11 @@ private:
 
     // Configuration values
     float m_exposure;
+    float m_contrast;
+    float m_hueShift;
+	float m_saturation;
+	glm::vec3 m_colorFilter;
+
     // (todo) 09.X: Declare new configuration values
 
 };
