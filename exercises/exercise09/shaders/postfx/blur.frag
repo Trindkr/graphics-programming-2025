@@ -20,6 +20,12 @@ const float weights[3] = float[](0.2270270270f, 0.3162162162f, 0.0702702703f);
 
 void main()
 {
+    if (BlurStrength <= 0.0001)
+    {
+        FragColor = texture(SourceTexture, TexCoord);
+        return;
+    }
+
    // Sample the pixel at the center
    vec4 color = texture(SourceTexture, TexCoord) * weights[0];
 
