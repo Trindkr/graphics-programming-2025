@@ -63,9 +63,15 @@ private:
     std::shared_ptr<FramebufferObject> m_sceneFramebuffer;
     std::shared_ptr<Texture2DObject> m_depthTexture;
     std::shared_ptr<Texture2DObject> m_sceneTexture;
-    // (todo) 09.3: Declare an array of 2 temporary framebuffers
 
-    // (todo) 09.3: Declare an array of 2 temporary textures
+    std::shared_ptr<Material>   m_horizontalBlurMaterial;
+	std::shared_ptr<Material>   m_verticalBlurMaterial;
+    
+    //09.3: Declare an array of 2 temporary framebuffers
+    std::shared_ptr<FramebufferObject> m_tempBlurBuffers[2];
+
+    //09.3: Declare an array of 2 temporary textures
+    std::shared_ptr<Texture2DObject> m_tempBlurTextures[2];
 
 
     // Configuration values
@@ -74,6 +80,7 @@ private:
     float m_hueShift;
 	float m_saturation;
 	glm::vec3 m_colorFilter;
+    float m_blurStrength;
 
     // (todo) 09.X: Declare new configuration values
 

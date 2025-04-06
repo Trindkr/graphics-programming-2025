@@ -34,6 +34,7 @@ PostFXSceneViewerApplication::PostFXSceneViewerApplication()
 	, m_hueShift(0.0f)
 	, m_saturation(1.0f)
 	, m_colorFilter(1.0f)
+	, m_blurStrength(1.0f)
     // (todo) 09.X: Set default value of configuration properties
 
 {
@@ -274,7 +275,28 @@ void PostFXSceneViewerApplication::InitializeFramebuffers()
     m_sceneFramebuffer->SetDrawBuffers(std::array<FramebufferObject::Attachment, 1>({ FramebufferObject::Attachment::Color0 }));
     FramebufferObject::Unbind();
 
-    // (todo) 09.3: Add temp textures and frame buffers
+    //09.3: Add temp textures and frame buffers
+	for (int i = 0; i < 2; ++i)
+	{
+        m_tempBlurTextures[i] = std::make_shared<Texture2DObject>();
+        m_tempBlurTextures[i]->Bind();
+        m_tempBlurTextures[i]->SetImage(0, width, height, TextureObject::FormatRGBA, TextureObject::InternalFormat::InternalFormatRGBA16F);
+        m_tempBlurTextures[i]->SetParameter(TextureObject::ParameterEnum::MinFilter, GL_LINEAR);
+        m_tempBlurTextures[i]->SetParameter(TextureObject::ParameterEnum::MagFilter, GL_LINEAR);
+        m_tempBlurTextures[i]->SetParameter(TextureObject::ParameterEnum::WrapS, GL_CLAMP_TO_EDGE);
+        m_tempBlurTextures[i]->SetParameter(TextureObject::ParameterEnum::WrapT, GL_CLAMP_TO_EDGE);
+        Texture2DObject::Unbind();
+	}
+
+	for (int i = 0; i < 2; ++i)
+	{
+        m_tempBlurBuffers[i] = std::make_shared<FramebufferObject>();
+        m_tempBlurBuffers[i]->Bind();
+        m_tempBlurBuffers[i]->SetTexture(FramebufferObject::Target::Draw, FramebufferObject::Attachment::Color0, *m_tempBlurTextures[i]);
+        m_tempBlurBuffers[i]->SetDrawBuffers(std::array<FramebufferObject::Attachment, 1>({ FramebufferObject::Attachment::Color0 }));
+		FramebufferObject::Unbind();
+	}
+
 
 }
 
@@ -307,18 +329,29 @@ void PostFXSceneViewerApplication::InitializeRenderer()
     // Skybox pass
     m_renderer.AddRenderPass(std::make_unique<SkyboxRenderPass>(m_skyboxTexture));
 
-    // (todo) 09.3: Create a copy pass from m_sceneTexture to the first temporary texture
-
+    //09.3: Create a copy pass from m_sceneTexture to the first temporary texture
+    std::shared_ptr<Material> copyMaterial = CreatePostFXMaterial("shaders/postfx/copy.frag", m_sceneTexture);
+    m_renderer.AddRenderPass(std::make_unique<PostFXRenderPass>(copyMaterial, m_tempBlurBuffers[0]));
+    
 
     // (todo) 09.4: Replace the copy pass with a new bloom pass
 
 
-    // (todo) 09.3: Add blur passes
+    //09.3: Add blur passes
+    m_horizontalBlurMaterial = CreatePostFXMaterial("shaders/postfx/blur.frag", m_tempBlurTextures[0]);
+    m_verticalBlurMaterial = CreatePostFXMaterial("shaders/postfx/blur.frag", m_tempBlurTextures[1]);
 
+    m_horizontalBlurMaterial->SetUniformValue("Scale", glm::vec2(1.0f / width, 0.0f));
+    m_verticalBlurMaterial->SetUniformValue("Scale", glm::vec2(0.0f, 1.0f / height));
+    m_horizontalBlurMaterial->SetUniformValue("BlurStrength", m_blurStrength);
+    m_verticalBlurMaterial->SetUniformValue("BlurStrength", m_blurStrength);
+
+	m_renderer.AddRenderPass(std::make_unique<PostFXRenderPass>(m_horizontalBlurMaterial, m_tempBlurBuffers[1]));
+	m_renderer.AddRenderPass(std::make_unique<PostFXRenderPass>(m_verticalBlurMaterial, m_tempBlurBuffers[0]));
 
     // Final pass
     //09.1: Replace with a new m_composeMaterial, using a new shader
-    m_composeMaterial = CreatePostFXMaterial("shaders/postfx/compose.frag", m_sceneTexture);
+    m_composeMaterial = CreatePostFXMaterial("shaders/postfx/compose.frag", m_tempBlurTextures[0]);
     m_renderer.AddRenderPass(std::make_unique<PostFXRenderPass>(m_composeMaterial, m_renderer.GetDefaultFramebuffer()));
 
     //09.1: Set exposure uniform default value
@@ -398,22 +431,26 @@ void PostFXSceneViewerApplication::RenderGUI()
             {
                 m_composeMaterial->SetUniformValue("Exposure", m_exposure);
             }
-			if (ImGui::DragFloat("Contrast", &m_contrast, 0.01f, 0.5f, 1.5f))
-			{
-				m_composeMaterial->SetUniformValue("Contrast", m_contrast);
-			}
+            if (ImGui::DragFloat("Contrast", &m_contrast, 0.01f, 0.5f, 1.5f))
+            {
+                m_composeMaterial->SetUniformValue("Contrast", m_contrast);
+            }
             if (ImGui::DragFloat("Hue Shift", &m_hueShift, 0.01f, -0.5f, 0.5f))
             {
                 m_composeMaterial->SetUniformValue("HueShift", m_hueShift);
             }
-			if (ImGui::DragFloat("Saturation", &m_saturation, 0.01f, 0.0f, 2.0f))
-			{
-				m_composeMaterial->SetUniformValue("Saturation", m_saturation);
-			}
-			if (ImGui::ColorEdit3("Color Filter", &m_colorFilter[0]))
-			{
-				m_composeMaterial->SetUniformValue("ColorFilter", m_colorFilter);
-			}
+            if (ImGui::DragFloat("Saturation", &m_saturation, 0.01f, 0.0f, 2.0f))
+            {
+                m_composeMaterial->SetUniformValue("Saturation", m_saturation);
+            }
+            if (ImGui::ColorEdit3("Color Filter", &m_colorFilter[0]))
+            {
+                m_composeMaterial->SetUniformValue("ColorFilter", m_colorFilter);
+            }
+            if (ImGui::DragFloat("Blur Strength", &m_blurStrength, 0.01f, 0.0f, 5.0f))
+            {
+                m_verticalBlurMaterial->SetUniformValue("BlurStrength", m_blurStrength);
+            }
         }
     }
 
