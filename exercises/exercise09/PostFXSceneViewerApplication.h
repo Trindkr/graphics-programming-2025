@@ -54,10 +54,11 @@ private:
     std::shared_ptr<TextureCubemapObject> m_skyboxTexture;
 
     // Materials
+    
     std::shared_ptr<Material> m_defaultMaterial;
     std::shared_ptr<Material> m_deferredMaterial;
     std::shared_ptr<Material> m_composeMaterial;
-    // (todo) 09.4: Add a new material for bloom
+    std::shared_ptr<Material> m_bloomMaterial; //09.4: Add a new material for bloom
 
     // Framebuffers
     std::shared_ptr<FramebufferObject> m_sceneFramebuffer;
@@ -81,7 +82,8 @@ private:
 	float m_saturation;
 	glm::vec3 m_colorFilter;
     float m_blurStrength;
-
+    glm::vec2 m_range;
+	float m_intensity;
     // (todo) 09.X: Declare new configuration values
 
 };

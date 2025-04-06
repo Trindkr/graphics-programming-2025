@@ -11,13 +11,18 @@ uniform float Contrast;
 uniform float HueShift;
 uniform float Saturation;
 uniform vec3 ColorFilter;
+uniform sampler2D BloomTexture;
 
 void main()
 {
 	vec3 color = texture(SourceTexture, TexCoord).rgb;
-	
+	vec3 bloom = texture(BloomTexture, TexCoord).rgb;
+
+	//Bloom
+	color += bloom;
+
 	// Exposure
-	vec3 exposedColor = 1.0 - exp(-color * Exposure).rbg;
+	vec3 exposedColor = 1.0 - exp(-color * Exposure).rgb;
 	
 	// Contrast
 	vec3 contrastColor = clamp((exposedColor.rgb - vec3(0.5)) * Contrast + vec3(0.5), vec3(0.0), vec3(1.0));
